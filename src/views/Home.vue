@@ -13,11 +13,12 @@
       </div>
       <div class=' col-6 offset-3' v-if='forecast'>
         <div class='card text-white bg-primary mb-3'>
-          <div class='card-header'>Current Weather</div>
+          <div class='card-header header__title'>
+            <strong>Current Weather</strong> - {{address.name}}</div>
             <div class='card-body text-center'>
               <h4 class='card-title'>{{forecast.currently.summary}}</h4>
               <div class='card-text'>
-                <skycon v-bind:condition='forecast.currently.icon | uppercase'></skycon>
+                <span class='temp-icon'>{{icons[forecast.currently.icon]}} </span>
                 <span class='temp-text'>{{forecast.currently.temperature}} ℉</span>
               </div>
               <div class='card-text'>
@@ -44,25 +45,43 @@ export default {
   data() {
     return {
       location: '',
+      address: null,
       forecast: null,
+      icons: {
+        'clear-day': '☀️',
+        'clear-night': '🌕',
+        rain: '💦',
+        snow: '❄️',
+        sleet: '💦❄️',
+        wind: '💨',
+        fog: '🌫',
+        cloudy: '☁️',
+        'partly-cloudy-day': '⛅️',
+        'partly-cloudy-night': '☁️ 🌕',
+      },
     };
   },
   // when page loads, call the getWeather function from API
   mounted() {
-    API.getWeather().then((result) => {
-      console.log(result);
-      this.forecast = result;
-    });
+    this.loadWeather('37.8267', '-122.4233');
   },
   methods: {
+    loadWeather(lat, lng) {
+      API.getAddress(lat, lng).then((result) => {
+        console.log(result);
+        this.address = result;
+      });
+      API.getWeather(lat, lng).then((result) => {
+        console.log(result);
+        this.forecast = result;
+      });
+    },
     updateLocation() {
       API.getCoordinates(this.location).then((result) => {
         console.log(result);
+        this.loadWeather(result.latitude, result.longitude);
       });
     },
-  },
-  filters: {
-    uppercase: v => v.toUpperCase().replace(/-/g, '_'),
   },
 };
 </script>
@@ -70,5 +89,14 @@ export default {
 <style>
 .temp-text {
   font-size: 2em;
+}
+
+.temp-icon {
+  font-size: 5em;
+}
+
+.header__title {
+  font-size: 1.5em;
+  text-align: center;
 }
 </style>
