@@ -62,8 +62,7 @@ export default {
     },
   },
   filters: {
-    uppercase: v => v.toUpperCase().replace(/-/g, '_')
-    ,
+    uppercase: v => v.toUpperCase().replace(/-/g, '_'),
   },
 };
 </script>

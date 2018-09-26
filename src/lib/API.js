@@ -6,9 +6,9 @@ const location = '37.8267,-122.4233';
 
 const API_URL = `${proxy}https://api.darksky.net/forecast/${API_KEY}/${location}`;
 
-const GEO_API_URL = `${proxy}https://darksky.net/geo?=`;
+const GEO_API_URL = `${proxy}https://darksky.net/geo?q=`;
 
-function getCoordinates() {
+function getCoordinates(location) {
   return fetch(`${GEO_API_URL}${location}`)
     .then(response => response.json());
 }
