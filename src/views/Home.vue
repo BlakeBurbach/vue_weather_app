@@ -14,7 +14,7 @@
       <div class=' col-6 offset-3' v-if='forecast'>
         <div class='card text-white bg-primary mb-3'>
           <div class='card-header header__title'>
-            <strong>Current Weather</strong> - {{address.name}}</div>
+            <strong>Current Weather</strong> - {{address}}</div>
             <div class='card-body text-center'>
               <h4 class='card-title'>{{forecast.currently.summary}}</h4>
               <div class='card-text'>
@@ -26,6 +26,14 @@
               </div>
             </div>
           </div>
+      </div>
+      <div class="col-8 offset-2">
+        <iframe
+          id="map-embed-iframe"
+          frameborder="0"
+          height="500px"
+          width="100%"
+          :src='embedURL'></iframe>
       </div>
     </div>
   </div>
@@ -44,41 +52,46 @@ export default {
   components: {},
   data() {
     return {
-      location: '',
-      address: null,
+      embedURL: '',
+      location: localStorage.location || '',
+      address: localStorage.address || '',
       forecast: null,
       icons: {
-        'clear-day': '☀️',
-        'clear-night': '🌕',
-        rain: '💦',
-        snow: '❄️',
-        sleet: '💦❄️',
-        wind: '💨',
-        fog: '🌫',
-        cloudy: '☁️',
-        'partly-cloudy-day': '⛅️',
-        'partly-cloudy-night': '☁️ 🌕',
+        'clear-day': '☀️ ',
+        'clear-night': '🌕 ',
+        rain: '💦 ',
+        snow: '❄️ ',
+        sleet: '💦❄️ ',
+        wind: '💨 ',
+        fog: '🌫 ',
+        cloudy: '☁️ ',
+        'partly-cloudy-day': '⛅️ ',
+        'partly-cloudy-night': '☁️ 🌕 ',
       },
     };
   },
   // when page loads, call the getWeather function from API
   mounted() {
-    this.loadWeather('37.8267', '-122.4233');
+    this.loadWeather(localStorage.lat || '37.8267', localStorage.lng || '-122.4233');
   },
   methods: {
     loadWeather(lat, lng) {
+      localStorage.lat = lat;
+      localStorage.lng = lng;
+
+      this.embedURL = API.getEmbedURL(lat, lng);
+
       API.getAddress(lat, lng).then((result) => {
-        console.log(result);
-        this.address = result;
+        this.address = result.name;
+        localStorage.address = this.address;
       });
       API.getWeather(lat, lng).then((result) => {
-        console.log(result);
         this.forecast = result;
       });
     },
     updateLocation() {
       API.getCoordinates(this.location).then((result) => {
-        console.log(result);
+        localStorage.location = this.location;
         this.loadWeather(result.latitude, result.longitude);
       });
     },
